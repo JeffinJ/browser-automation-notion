@@ -2,7 +2,7 @@
 
 A browser automation to get the list of users and their information from Notion's workspace
 
-1. **Paywright**
+1. **Playwright**
 2. **Node.js**
 3. **TypeScript**
 
