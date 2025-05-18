@@ -1,6 +1,7 @@
 import { BrowserContext, Page } from "playwright";
 import { setupLogger } from "./utils";
 import { notionConfig } from "../config/notion.config";
+import { TOTP } from "otpauth";
 
 const logger = setupLogger('AUTH');
 
@@ -39,6 +40,35 @@ export async function signInWithGoogleToNotion({
         await popup.waitForSelector('input[type="password"]', { timeout: 10000 });
         await popup.fill('input[type="password"]', password);
         await popup.click('button:has-text("Next")');
+
+        const TWO_FACTOR_SELECTOR = 'input[aria-label="Enter code"]';
+        const has2FA = await popup.waitForSelector(TWO_FACTOR_SELECTOR, { timeout: 5000 })
+            .then(() => true)
+            .catch(() => false);
+
+
+        if (has2FA) {
+            logger.info('2FA verification required');
+
+            if (!notionConfig.totpSecret) {
+                throw new Error("TOTP secret is required for 2FA but was not provided");
+            }
+
+            const totp = new TOTP({
+                issuer: 'google',
+                label: notionConfig.googleEmail,
+                secret: notionConfig.totpSecret,
+            });
+            const otpCode = totp.generate();
+
+            const _2FAInputField = await popup.getByRole('textbox', { name: 'Enter code' });
+            if (!_2FAInputField) {
+                throw new Error("Failed to find the 2FA input field");
+            }
+            await popup.fill(TWO_FACTOR_SELECTOR, otpCode);
+            await popup.click('button:has-text("Next")');
+        }
+
         return true;
 
     } catch (error) {

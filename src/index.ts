@@ -39,7 +39,7 @@ async function getWorkSpaceMembers(page: Page): Promise<User[]> {
         await page.getByRole('tabpanel').screenshot({
             path: path,
         });
-        logger.info('Screenshot taken:', path);
+        logger.info('Screenshot taken & saved to:', path);
 
 
         const rowLocators = tableLocator.locator('tbody tr');
@@ -135,7 +135,7 @@ async function getWorkSpaceMembers(page: Page): Promise<User[]> {
     }
 }
 
-async function notionAutomation3() {
+async function notionAutomation() {
     let browser: Browser | null = null;
 
     try {
@@ -173,7 +173,7 @@ async function notionAutomation3() {
     }
 }
 
-notionAutomation3().catch((e) => {
-    console.error('error', e);
-
-});
+notionAutomation()
+    .catch((e) => {
+        console.error('error', e);
+    });
