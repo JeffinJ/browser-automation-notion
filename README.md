@@ -2,6 +2,10 @@
 
 A browser automation to get the list of users and their information from Notion's workspace
 
+1. **Paywright**
+2. **Node.js**
+3. **TypeScript**
+
 ## Automation flow
 
 1. Navigate to Notion's login page
