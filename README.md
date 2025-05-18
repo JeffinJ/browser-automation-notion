@@ -10,7 +10,9 @@ A browser automation to get the list of users and their information from Notion'
 
 1. Navigate to Notion's login page
 2. Click to Sign in with Google and log in with email address and password from the environment.
-   - If 2FA is enabled, wait for it to be completed
+   - If 2FA is enabled,
+     - If the user needs to press "Yes" on another device, wait for it to be completed.
+     - If the 2FA is TOTP, generate OTP using the TOTP from the environment and enter it, and continue. (otpauth)
 4. Once the Notion app is loaded, navigate to the Settings page.
 5. Click on the Members tab.
 6. Take a screenshot of the members window and save to `/screenshots/users-screen/..`
