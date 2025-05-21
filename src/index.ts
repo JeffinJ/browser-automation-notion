@@ -37,8 +37,8 @@ async function getWorkSpaceMembers(page: Page): Promise<User[]> {
         await tableLocator.locator('tbody tr').first().waitFor({ state: 'visible', timeout: 10000 });
 
         const screenshotFileName = `${workSpaceName}-screenshot-${new Date().toISOString().replace(/:/g, '-')}.png`;
-        fs.mkdirSync('screenshots/users-screen', { recursive: true })
-        const path = `screenshots/users-screen/${screenshotFileName}`
+        fs.mkdirSync('output/screenshots/users-screen', { recursive: true })
+        const path = `output/screenshots/users-screen/${screenshotFileName}`
         await page.getByRole('tabpanel').screenshot({
             path: path,
         });
