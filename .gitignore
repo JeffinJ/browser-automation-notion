@@ -1,3 +1,4 @@
 /node_modules
 /screenshots/users-screen/*
+/output/workspace-users/*
 .env

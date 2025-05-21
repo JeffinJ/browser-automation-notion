@@ -3,6 +3,8 @@ import { getWorkspaceSlug, initBrowser, setupLogger } from "@utils/utils";
 import { signInWithGoogleToNotion } from "@utils/auth.utils";
 import { User } from "./types/notion.types";
 import { notionConfig } from "./config/notion.config";
+import fs from "fs";
+import path from "path";
 
 const logger = setupLogger('NOTION-AUTOMATION');
 
@@ -22,7 +24,7 @@ async function getWorkSpaceMembers(page: Page): Promise<User[]> {
 
         // Handle open notion in app dialog
         const openInAppDialogClosButton = await page.getByRole('button') && page.getByLabel('Dismiss');
-        if (openInAppDialogClosButton) {
+        if (await openInAppDialogClosButton.isVisible({ timeout: 3000 })) {
             await openInAppDialogClosButton.click();
         }
 
@@ -35,6 +37,7 @@ async function getWorkSpaceMembers(page: Page): Promise<User[]> {
         await tableLocator.locator('tbody tr').first().waitFor({ state: 'visible', timeout: 10000 });
 
         const screenshotFileName = `${workSpaceName}-screenshot-${new Date().toISOString().replace(/:/g, '-')}.png`;
+        fs.mkdirSync('screenshots/users-screen', { recursive: true })
         const path = `screenshots/users-screen/${screenshotFileName}`
         await page.getByRole('tabpanel').screenshot({
             path: path,
@@ -135,6 +138,22 @@ async function getWorkSpaceMembers(page: Page): Promise<User[]> {
     }
 }
 
+async function saveUsersData(users: User[], workspaceName: string): Promise<string> {
+    try {
+        const outputDir = path.join('output', 'workspace-users');
+        fs.mkdirSync(outputDir, { recursive: true });
+
+        const timestamp = new Date().toISOString().replace(/:/g, '-');
+        const fileName = `${workspaceName}-user-data-${timestamp}.json`;
+        const filePath = path.join(outputDir, fileName);
+        fs.writeFileSync(filePath, JSON.stringify(users, null, 2), 'utf8');
+        return filePath;
+    } catch (error) {
+        logger.error('Error saving users data:', error);
+        throw new Error(`Failed to save users data: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+
 async function notionAutomation() {
     let browser: Browser | null = null;
 
@@ -161,6 +180,13 @@ async function notionAutomation() {
 
         const usersInWorkspace = await getWorkSpaceMembers(page);
         logger.info('usersInWorkspace', usersInWorkspace);
+
+        const urlPath = page.url();
+        const workspaceName = getWorkspaceSlug(urlPath);
+        if(!workspaceName) throw new Error('Failed to get workspace name from URL');
+
+        const savedFilePath = await saveUsersData(usersInWorkspace, workspaceName);
+        logger.info('Users data saved to:', savedFilePath);
 
     } catch (error) {
         console.error('An error occurred:', error);
