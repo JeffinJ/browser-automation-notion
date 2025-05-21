@@ -15,7 +15,8 @@ A browser automation to get the list of users and their information from Notion'
      - If the 2FA is TOTP, generate OTP using the TOTP from the environment and enter it, and continue. (otpauth)
 4. Once the Notion app is loaded, navigate to the Settings page.
 5. Click on the Members tab.
-6. Take a screenshot of the members window and save to `/screenshots/users-screen/..`
+6. Take a screenshot of the members window and save to `output/screenshots/users-screen/..`
+6. Save users data as `JSON` to `output/workspace-users/..`
 7. View the list of members in the current workspace.
 8. Get the user's data.
    - Get name.
